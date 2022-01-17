@@ -15,4 +15,4 @@ for (let day = 1; day <= DAYS; day++) {
     }
 }
 
-console.log(`There's a total of ${lanternfishes.length} fishes`)
+console.log("result", lanternfishes.length)

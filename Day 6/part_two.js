@@ -35,4 +35,4 @@ const count = [...fishCount.values()].reduce((acc, curr) => {
     return acc
 }, 0)
 
-console.log(`There's a total of ${count} fishes`)
+console.log('result', count)
