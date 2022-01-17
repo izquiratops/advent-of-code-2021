@@ -2,23 +2,11 @@ const crabs = data.split(',').map(Number)
 
 const costMap = new Map()
 
-function calculateCost(a, b) {
-    const fromValue = Math.min(a, b)
-    const toValue = Math.max(a, b)
-
-    let increment = 1
-    let output = 0
-    for (let i = fromValue; i < toValue; i++) {
-        output += increment
-        increment++
-    }
-
-    return output
-}
-
 for (let idx = 5; idx < crabs.length; idx++) {
     const total = crabs.reduce((acc, curr) => {
-        const cost = calculateCost(curr, idx)
+        const distance = Math.abs(curr, idx)
+        const cost = distance * (distance + 1) / 2
+
         // console.log(`Move from ${curr} to ${idx}: ${cost} fuel`)
         acc += cost
         return acc
