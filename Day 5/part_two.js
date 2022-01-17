@@ -1,8 +1,5 @@
-const data = require('./test_data.js')
-
 const vectors = data.split('\n').map(parseVector)
 const hits = new Map()
-const drawCondition = (vector) => vector.from.x === vector.to.x || vector.from.y === vector.to.y
 
 function parseVector(line) {
     const [from, to] = line.split(' -> ').map(coord => {
@@ -32,43 +29,32 @@ function* walkThrough(vec) {
         }
     } else {
         // diagonal walk
-        const directionX = vec.to.x > vec.from.x
-        const directionY = vec.to.y > vec.from.y
-        const step = { x: directionX ? 1 : -1, y: directionY ? 1 : -1 }
+        const distanceX = vec.to.x - vec.from.x
+        const distanceY = vec.to.y - vec.from.y
+        const step = { x: (distanceX > 0) ? 1 : -1, y: (distanceY > 0) ? 1 : -1 }
 
-        // for (let x = vec.from.x; direction ? (x <= vec.to.x) : (x >= vec.to.x); x += step) {
-        //     yield { x, y: vec.from.y }
-        // }
-    }
-}
-
-let height = 0
-let width = 0
-
-for (let vec of vectors) {
-    if (drawCondition(vec)) {
-        for (let point of walkThrough(vec)) {
-            const key = `${point.x}-${point.y}`
-            const value = hits.get(key) || 0
-            hits.set(key, value + 1)
-
-            // set boundaries
-            if (point.x > width) {
-                width = point.x
-            }
-            if (point.y > height) {
-                height = point.y
-            }
+        // we're expecting 45º lines ONLY
+        for (let i = 0; i <= Math.abs(distanceX); i++) {
+            yield { x: vec.from.x + (step.x * i), y: vec.from.y + (step.y * i) }
         }
     }
 }
 
-let result = 0
+// hit the lines
+for (let vec of vectors) {
+    for (let point of walkThrough(vec)) {
+        const key = `${point.x}-${point.y}`
+        const value = hits.get(key) || 0
+        hits.set(key, value + 1)
+    }
+}
 
-for (let y = 0; y <= width; y++) {
-    for (let x = 0; x <= height; x++) {
-        const value = hits.get(`${x}-${y}`) || 0
-        result += (value >= 2) ? 1 : 0
+// get the nº of intersections
+// ! got rid of height/width because printing lines is not required
+let result = 0
+for (let value of hits.values()) {
+    if (value >= 2) {
+        result++
     }
 }
 
