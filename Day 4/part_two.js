@@ -1,6 +1,6 @@
 // parse input
-calls = data.calls.split(",").map(Number)
-boards = data.boards.split("\n\n").map(parseBoards)
+calls = calls.split(",").map(Number)
+boards = boards.split("\n\n").map(parseBoards)
 
 const alreadyCalled = new Set()
 const winnerBoards = new Set()
