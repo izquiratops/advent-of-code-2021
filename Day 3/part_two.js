@@ -1,5 +1,4 @@
-const diagnostic = require('./data.js')
-
+const diagnostic = data.split('\n')
 const BIT_LENGTH = 12
 const bitCount = new Map()
 

@@ -1,4 +1,4 @@
-module.exports = `188
+const data = `188
 192
 193
 194
@@ -1997,4 +1997,4 @@ module.exports = `188
 10396
 10397
 10406
-10415`.split('\n').map(Number)
+10415`

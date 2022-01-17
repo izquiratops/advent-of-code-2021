@@ -1,5 +1,4 @@
-const diagnostic = require('./data.js')
-
+const diagnostic = data.split('\n')
 let gamma = ''
 let epsilon = ''
 const hits = new Map()

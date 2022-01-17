@@ -1,8 +1,7 @@
-const data = require('./data.js')
+// parse input
+calls = calls.split(",").map(Number)
+boards = boards.split("\n\n").map(parseBoards)
 
-const calls = data.calls.split(",").map(Number)
-// Boards are indented with 3 spaces!
-const boards = data.boards.split("\n   \n").map(parseBoards)
 const alreadyCalled = new Set()
 
 function parseBoards(board) {

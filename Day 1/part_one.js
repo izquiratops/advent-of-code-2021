@@ -1,5 +1,4 @@
-const measurements = require('./data')
-
+const measurements = data.split('\n').map(Number)
 let count = 0;
 
 for (let idx = 0; idx < measurements.length; idx++) {

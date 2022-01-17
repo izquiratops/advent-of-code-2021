@@ -1,8 +1,7 @@
-const data = require('./data.js')
+// parse input
+calls = data.calls.split(",").map(Number)
+boards = data.boards.split("\n\n").map(parseBoards)
 
-const calls = data.calls.split(",").map(Number)
-// Boards are indented with 3 spaces!
-const boards = data.boards.split("\n   \n").map(parseBoards)
 const alreadyCalled = new Set()
 const winnerBoards = new Set()
 let lastScore = 0

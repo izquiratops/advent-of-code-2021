@@ -1,4 +1,4 @@
-module.exports = `forward 3
+const data = `forward 3
 down 9
 forward 6
 down 3
@@ -997,8 +997,4 @@ forward 6
 forward 8
 forward 9
 forward 2
-forward 5
-`.split('\n').map(line => {
-    const [cmd, degree] = line.split(' ')
-    return [cmd, parseInt(degree)]
-})
+forward 5`
