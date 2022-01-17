@@ -1,5 +1,3 @@
-const data = require('./data.js')
-
 const vectors = data.split('\n').map(parseVector)
 const hits = new Map()
 const drawCondition = (vector) => vector.from.x === vector.to.x || vector.from.y === vector.to.y
@@ -33,34 +31,23 @@ function* walkThrough(vec) {
     }
 }
 
-let height = 0
-let width = 0
-
+// hit the lines
 for (let vec of vectors) {
     if (drawCondition(vec)) {
         for (let point of walkThrough(vec)) {
             const key = `${point.x}-${point.y}`
             const value = hits.get(key) || 0
             hits.set(key, value + 1)
-
-            // set boundaries
-            if (point.x > width) {
-                width = point.x
-            }
-            if (point.y > height) {
-                height = point.y
-            }
         }
     }
 }
 
+// get the nº of intersections
 let result = 0
-
-for (let y = 0; y <= width; y++) {
-    for (let x = 0; x <= height; x++) {
-        const value = hits.get(`${x}-${y}`) || 0
-        result += (value >= 2) ? 1 : 0
+for (let value of hits.values()) {
+    if (value >= 2) {
+        result++
     }
 }
 
-console.log(result)
+console.log('interescted points', result)

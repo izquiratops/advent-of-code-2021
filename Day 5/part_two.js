@@ -50,7 +50,6 @@ for (let vec of vectors) {
 }
 
 // get the nº of intersections
-// ! got rid of height/width because printing lines is not required
 let result = 0
 for (let value of hits.values()) {
     if (value >= 2) {
@@ -58,4 +57,4 @@ for (let value of hits.values()) {
     }
 }
 
-console.log(result)
+console.log('interescted points', result)
