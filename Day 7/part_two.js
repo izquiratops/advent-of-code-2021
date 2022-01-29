@@ -7,6 +7,8 @@ for (let idx = 5; idx < crabs.length; idx++) {
         const distance = Math.abs(curr, idx)
         const cost = distance * (distance + 1) / 2
 
+        debugger
+
         // console.log(`Move from ${curr} to ${idx}: ${cost} fuel`)
         acc += cost
         return acc
