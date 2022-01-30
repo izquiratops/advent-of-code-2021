@@ -27,7 +27,7 @@ function encodeNumber(number) {
 
 // segments -> number
 function decodeNumber(segments) {
-    switch (toCanonical(segments)) {
+    switch (segments) {
         case 'abcefg': return 0
         case 'cf': return 1
         case 'acdeg': return 2
@@ -38,12 +38,12 @@ function decodeNumber(segments) {
         case 'acf': return 7
         case 'abcdefg': return 8
         case 'abcdfg': return 9
-        default: null
+        default: return null
     }
 }
 
 function toCanonical(input) {
-    return input.split('').sort().join()
+    return input.split('').sort().join('')
 }
 
 function* explode(arrays) {
@@ -51,15 +51,16 @@ function* explode(arrays) {
         yield* arrays[0]
     } else {
         const [head, ...tail] = arrays
-        for (const explodedTailItem of explode(tail)) {
-            for (const headItem of head) {
-                yield headItem + explodedTailItem
+
+        for (const recursiveTail of explode(tail)) {
+            for (const recursiveHead of head) {
+                yield recursiveHead + recursiveTail
             }
         }
     }
 }
 
-function foo(signal) {
+function guessTheDamnThing(signal) {
     const candidateMap = new Map([
         ['a', 'abcdefg'.split('')],
         ['b', 'abcdefg'.split('')],
@@ -69,6 +70,8 @@ function foo(signal) {
         ['f', 'abcdefg'.split('')],
         ['g', 'abcdefg'.split('')]
     ])
+
+    /* Get a solid clue with the easy (length unique) numbers */
 
     function narrowPossibilities(segment, possibilities) {
         const candidates = candidateMap.get(segment)
@@ -114,117 +117,66 @@ function foo(signal) {
         }
     }
 
-    for (let baz of explode([...candidateMap.values()])) {
-        console.log(baz)
+    /* Let's guess the rest */
+
+    // Validate if every character is unique
+    function explodeCandidates(blob) {
+        const candidates =  blob.split('').map(c => candidateMap.get(c))
+        return [...explode(candidates)]
     }
-}
 
-let result = 0
-for (let { signal, output } of input_instances) {
-    foo(signal)
-}
-
-/*
-function getSegmentMap(signal) {
-    const segmentMap = new Map([
-        ['top', new Map()],
-        ['top-left', new Map()],
-        ['top-right', new Map()],
-        ['middle', new Map()],
-        ['bottom-left', new Map()],
-        ['bottom-right', new Map()],
-        ['bottom', new Map()],
-    ]);
-
-    function hitBlob(blob, mapping) {
-        for (let char of blob) {
-            for (let segment of mapping.values()) {
-                // segment = 'top'
-                // counts = ['a': 6, 'b': 4, 'c': 8...]
-                const counts = segmentMap.get(segment)
-                const count = counts.get(char) | 0
-                counts.set(char, count + 1)
-            }
+    function isValid(candidate) {
+        const uniqueCandidates = new Set(candidate.split(''))
+        if (uniqueCandidates.size !== candidate.length) {
+            return false
         }
+
+        return decodeNumber(candidate) !== null;
     }
+
+    const configuration = new Map()
 
     for (let blob of signal) {
-        const numbers = NUMBERS_BY_LENGTH.get(blob.length)
+        // Get every possible way to order the candidates
+        const candidates = explodeCandidates(blob)
+        // Get rid of duplicates with different order (digit segments doesn't care about order)
+        const filteredCandidates = [...new Set(candidates.map(toCanonical))]
+        // Filter candidates with duplicated characters + try to validate with a decoded success
+        const matchingCandidates = filteredCandidates.filter(isValid)
 
-        // ! This is wrong
-        for (let number of numbers) {
-            const mapping = MAPPINGS.get(number);
-            hitBlob(blob, mapping)
-        }
-    }
-
-    return segmentMap
-}
-
-function guessConfiguration(segmentMap) {
-    const configuration = new Map()
-    const alreadyWon = new Set()
-
-    while (configuration.size < 7) {
-        for (let [segment, counts] of segmentMap) {
-            let candidates = { char: [], count: 0 }
-
-            counts = Array.from(counts.entries())
-                .map(([char, count]) => ({ char, count }))
-                .filter(count => !alreadyWon.has(count.char))
-                .forEach((curr) => {
-                    if (curr.count > candidates.count) {
-                        candidates.char = [curr.char]
-                        candidates.count = curr.count
-                    } else if (curr.count === candidates.count) {
-                        candidates.char.push(curr.char)
-                    }
-                })
-
-            if (candidates.char.length === 1) {
-                const winnerChar = candidates.char.pop()
-                configuration.set(winnerChar, segment)
-
-                alreadyWon.add(winnerChar)
-                segmentMap.delete(segment)
-            }
+        if (matchingCandidates.length === 1) {
+            configuration.set(toCanonical(blob), matchingCandidates[0])
+        } else {
+            throw Error('uwu')
         }
     }
 
     return configuration
 }
 
-function decodeOutput(output, configuration) {
-    let decoded = ''
-    const alphabetical = (a, b) => a > b ? -1 : 1
+function decodeOutput(encodedOutput, configuration) {
+    // Output comes unsorted
+    encodedOutput = encodedOutput.map(blob => toCanonical(blob))
 
-    outerLoop: for (let blob of output) {
-        // Get segments of blob
-        const segments = []
-        for (let char of blob) {
-            const segment = configuration.get(char)
-            segments.push(segment)
-        }
-
-        // Get actual number
-        for (let [number, mapping] of MAPPINGS.entries()) {
-            const sortedMapping = mapping.sort(alphabetical).join()
-            const sortedSegments = segments.sort(alphabetical).join()
-
-            if (sortedMapping === sortedSegments) {
-                decoded += number.toString()
-                continue outerLoop
-            }
-        }
-
-        debugger
-
-        // Something gone wrong if we're getting out of the loop
-        // without any mapping match
-        throw Error('🤔')
+    let decodedOutput = ''
+    // encodedOutput = ['ced', 'cgbefad', 'gbcaef', 'cd']
+    for (let blob of encodedOutput) {
+        // from 'ced' to pattern = 'acf'
+        const pattern = configuration.get(blob)
+        // 'acf -> 7
+        const decodedValue = decodeNumber(pattern)
+        decodedOutput += decodedValue
     }
 
-    return parseInt(decoded)
+    return parseInt(decodedOutput)
 }
 
-*/
+let result = 0
+for (let { signal, output } of input_instances) {
+    const configuration = guessTheDamnThing(signal)
+    const decodedNumber = decodeOutput(output, configuration)
+
+    result += decodedNumber
+}
+
+console.log(result)
