@@ -20,11 +20,11 @@ function isSmallCave(name) {
 	return name.toLowerCase() === name
 }
 
-function* walk(cave, smallVisitedSet, opts) {
+function* walk(cave, smallVisitedSet, letVisitTwice) {
 	// check if small cave can be visited twice
 	if (smallVisitedSet.has(cave)) {
-		if (opts.letVisitTwice && !(cave === 'start' || cave === 'end')) {
-			opts.letVisitTwice = false
+		if (letVisitTwice && !(cave === 'start' || cave === 'end')) {
+			letVisitTwice = false
 		} else {
 			return
 		}
@@ -40,7 +40,7 @@ function* walk(cave, smallVisitedSet, opts) {
 
 	for (const nextCave of neighborMap.get(cave)) {
 		// clone the "small caves set" for every new walk step
-		const pathCandidates = walk(nextCave, new Set(smallVisitedSet), { ...opts })
+		const pathCandidates = walk(nextCave, new Set(smallVisitedSet), letVisitTwice)
 		for (const nextPath of pathCandidates) {
 			yield [cave, ...nextPath]
 		}
@@ -55,6 +55,6 @@ for (let connection of connections) {
 }
 
 // 2. Search all the paths
-const paths = [...walk('start', new Set(), { letVisitTwice: true })]
+const paths = [...walk('start', new Set(), true)]
 
 console.log(paths.length)
