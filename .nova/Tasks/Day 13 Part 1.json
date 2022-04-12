@@ -6,5 +6,6 @@
   "extensionTemplate" : "nodeDebug",
   "extensionValues" : {
     "scriptPath" : "Day 13\/part_one.js"
-  }
+  },
+  "openLogOnRun" : "start"
 }

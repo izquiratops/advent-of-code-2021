@@ -1,5 +1,9 @@
 {
+  "apexskier.eslint.config.eslintPath" : "node_modules\/eslint\/bin\/eslint.js",
+  "cssvalidator.enabled" : false,
   "editor.default_syntax" : "javascript",
+  "htmlvalidator.enabled" : false,
+  "prettier.format-on-save" : "Enable",
   "prettier.module.path" : "\/Users\/izquiratops\/Projects\/advent-of-code-2021\/node_modules\/prettier",
   "workspace.color" : 1,
   "workspace.name" : "Advent of Code"

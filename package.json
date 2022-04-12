@@ -2,7 +2,6 @@
   "name": "advent-of-code-2021",
   "version": "1.0.0",
   "description": "Advent of Code 2021",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,6 +23,7 @@
   },
   "homepage": "https://github.com/izquiratops/advent-of-code-2021#readme",
   "dependencies": {
+    "eslint": "^8.13.0",
     "prettier": "^2.6.2"
   }
 }
