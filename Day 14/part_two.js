@@ -1,96 +1,56 @@
-const fs = require("fs");
-const inputString = fs.readFileSync(__dirname + "/data_test.txt").toString();
+const { poly, rules } = require('./input.js');
 
-// Helper functions
-
-Array.prototype.max = function() {
-	return Math.max.apply(null, this);
-};
-
-Array.prototype.min = function() {
-	return Math.min.apply(null, this);
-};
-
-function onlyUnique(value, idx, array) {
-	return array.indexOf(value) === idx;
+Map.prototype.incrementCount = function(key, increment = 1) {
+	const curr = this.get(key) || 0;
+	this.set(key, curr + increment);
 }
 
-// ---------- Day 14 Part B ----------
-
-function parseInput(input) {
-	const [polymerTemplate, pairInsertion] = input.split('\n\n');
-
-	const pairInsertionList = pairInsertion
-		.split('\n')
-		.map(curr => curr.split(' -> '));
-
-	return [
-		// Polymer template: 'NNBC'
-		polymerTemplate.split(''),
-		// Pair insertion Map: { 'NN' -> 'C', ... }
-		new Map(pairInsertionList)
-	];
+let pairs = new Map();
+for (let idx = 0; idx < poly.length - 1; idx++) {
+	const first = poly[idx];
+	const second = poly[idx + 1];
+	pairs.incrementCount(first + second);
 }
-
-function initializeNodes(polymerValueList) {
-	let tmpNextNode = null;
-
-	for (let idx = polymerValueList.length - 1; idx >= 0; idx--) {
-		const node = {
-			value: polymerValueList[idx],
-			next: tmpNextNode
-		};
-
-		tmpNextNode = node;
-	}
-
-	return tmpNextNode;
-}
-
-function walk(node) {
-	while (node.next) {
-		const currentNodeValue = node.value;
-		const nextNodeValue = node.next.value;
-		const insertedNode = {
-			value: pairInsertationMap.get(currentNodeValue + nextNodeValue),
-			next: node.next
-		};
-
-		const nextStep = node.next;
-		node.next = insertedNode;
-		node = nextStep;
-	}
-}
-
-function calculateCharCounts(node) {
-	const counts = new Map();
-
-	while(true) {
-		const count = counts.get(node.value) | 0;
-		counts.set(node.value, count + 1);
-
-		if (node.next) {
-			node = node.next;
-		} else {
-			break;
-		}
-	}
-
-	return counts;
-}
-
-// ---------- Init ----------
-const [polymerInitStack, pairInsertationMap] = parseInput(inputString);
-
-const firstNode = initializeNodes(polymerInitStack);
 
 for (let step = 0; step < 40; step++) {
-	console.debug(step);
-	walk(firstNode);
+	// Keeping track of *this* step
+	let new_pairs = new Map();
+
+	for (const [pair, currentCount] of pairs) {
+		// 'NN' -> 'C'
+		const result = rules.get(pair);
+		// 'NC'
+		const first = pair[0] + result;
+		new_pairs.incrementCount(first, currentCount);
+		// 'CN'
+		const second = result + pair[1];
+		new_pairs.incrementCount(second, currentCount);
+	}
+
+	pairs = new_pairs;
+	// console.debug(`Step: ${step}`, [...pairs.entries()]);
 }
 
-const charCounts = calculateCharCounts(firstNode);
-const mostCommon = [...charCounts.values()].max();
-const leastCommon = [...charCounts.values()].min();
+const totalCount = new Map();
+console.log([...pairs.values()]);
 
-console.log(`${mostCommon} - ${leastCommon} = ${mostCommon - leastCommon}`);
+for (const [pair, count] of pairs) {
+	for (const char of pair) {
+		totalCount.incrementCount(char, count);
+	}
+}
+
+// 'NN' -> 'NC' + 'CN' -> meaning that every char
+// is doubled but the very first and last one.
+totalCount.incrementCount(poly[0]);
+totalCount.incrementCount(poly[poly.length - 1]);
+
+const totalCountList = [...totalCount.entries()]
+	.map(([char, count]) => ({ char, count: count / 2 }))
+	.sort((a, b) => b.count - a.count);
+
+const max = totalCountList[0].count;
+const min = totalCountList[totalCountList.length - 1].count;
+console.log('max', max);
+console.log('min', min);
+console.log('result', max - min);
